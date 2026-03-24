@@ -1,0 +1,76 @@
+CREATE DATABASE IF NOT EXISTS haizimen_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE haizimen_db;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    role VARCHAR(50) NOT NULL DEFAULT 'parent',
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    gender VARCHAR(20) NOT NULL,
+    dob DATE NOT NULL,
+    certificate_path VARCHAR(255) DEFAULT NULL,
+    blood_group VARCHAR(20) DEFAULT NULL,
+    height VARCHAR(20) DEFAULT NULL,
+    weight VARCHAR(20) DEFAULT NULL,
+    mother_name VARCHAR(100) DEFAULT NULL,
+    father_name VARCHAR(100) DEFAULT NULL,
+    address TEXT DEFAULT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    phone VARCHAR(30) NOT NULL,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS login (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED DEFAULT NULL,
+    Username VARCHAR(100) NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_login_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS doctors (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED DEFAULT NULL,
+    doctor_name VARCHAR(150) NOT NULL,
+    department VARCHAR(150) NOT NULL,
+    email VARCHAR(150) DEFAULT NULL,
+    phone VARCHAR(30) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_doctors_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS vaccines (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    vaccine_name VARCHAR(150) NOT NULL,
+    age_group VARCHAR(100) DEFAULT NULL,
+    description TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS appointments (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    parent_user_id INT UNSIGNED NOT NULL,
+    doctor_id INT UNSIGNED NOT NULL,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    notes TEXT DEFAULT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_appointments_parent FOREIGN KEY (parent_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_appointments_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS vaccinations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    vaccine_id INT UNSIGNED NOT NULL,
+    dose_number VARCHAR(50) DEFAULT NULL,
+    scheduled_date DATE DEFAULT NULL,
+    booked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_vaccinations_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_vaccinations_vaccine FOREIGN KEY (vaccine_id) REFERENCES vaccines(id) ON DELETE CASCADE
+);
