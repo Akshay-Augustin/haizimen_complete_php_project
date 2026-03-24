@@ -15,17 +15,18 @@ $role = $user['role'];
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #081b2d, #0b1c2c);
-            color: white;
+            background: #f4f9ff;
+            color: #1b2b3a;
             min-height: 100vh;
         }
 
         .topbar {
-            background: #071a2b;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: #ffffff;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .topbar-inner {
@@ -39,7 +40,7 @@ $role = $user['role'];
         }
 
         .brand {
-            color: white;
+            color: #1b6ec2;
             text-decoration: none;
             font-size: 24px;
             font-weight: bold;
@@ -60,21 +61,21 @@ $role = $user['role'];
             padding: 10px 16px;
             border-radius: 8px;
             text-decoration: none;
-            color: white;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
+            color: #1b2b3a;
+            background: #eaf4ff;
+            border: 1px solid #d9ebfb;
             font-weight: bold;
             transition: 0.2s ease;
         }
 
         .nav-btn:hover {
-            background: #ff5a3c;
+            background: #1b6ec2;
             color: white;
         }
 
         .nav-btn.logout {
-            background: rgba(255, 90, 60, 0.12);
-            border-color: rgba(255, 90, 60, 0.25);
+            background: #eaf4ff;
+            border-color: #d9ebfb;
         }
 
         .wrap {
@@ -84,24 +85,25 @@ $role = $user['role'];
         }
 
         .card {
-            background: #10263d;
+            background: #ffffff;
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
             margin-bottom: 25px;
         }
 
         .msg {
             padding: 12px 14px;
-            background: rgba(80, 200, 120, 0.15);
-            border: 1px solid rgba(80, 200, 120, 0.4);
-            color: #d8ffe5;
+            background: #e8fff1;
+            border: 1px solid #aad7b7;
+            color: #1e6c35;
             margin-bottom: 20px;
             border-radius: 8px;
         }
 
         h1, h2 {
             margin-top: 0;
+            color: #1b6ec2;
         }
 
         .user-meta {
@@ -111,12 +113,12 @@ $role = $user['role'];
         }
 
         .meta-item {
-            color: #dbe6f2;
+            color: #4a5c6b;
             font-size: 17px;
         }
 
         .meta-item i {
-            color: #ff5a3c;
+            color: #1b6ec2;
             width: 24px;
         }
 
@@ -127,16 +129,17 @@ $role = $user['role'];
         }
 
         .feature-card {
-            background: #0b1c2c;
+            background: #f9fcff;
             padding: 24px;
             border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid #d9ebfb;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .feature-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.22);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            background: #eef7ff;
         }
 
         .feature-icon {
@@ -146,20 +149,20 @@ $role = $user['role'];
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 90, 60, 0.12);
-            color: #ff5a3c;
+            background: #eaf4ff;
+            color: #1b6ec2;
             font-size: 24px;
             margin-bottom: 18px;
         }
 
         .feature-card h3 {
             margin-top: 0;
-            color: #fff;
+            color: #1b2b3a;
             margin-bottom: 12px;
         }
 
         .feature-card p {
-            color: #dbe6f2;
+            color: #4a5c6b;
             line-height: 1.7;
             margin-bottom: 0;
         }
@@ -168,7 +171,7 @@ $role = $user['role'];
             display: inline-block;
             margin-top: 18px;
             padding: 10px 18px;
-            background: #ff5a3c;
+            background: #1b6ec2;
             color: white;
             border-radius: 6px;
             text-decoration: none;
@@ -176,7 +179,7 @@ $role = $user['role'];
         }
 
         .btn:hover {
-            background: #e14a2f;
+            background: #155a9c;
         }
 
         @media (max-width: 768px) {
@@ -206,7 +209,7 @@ $role = $user['role'];
                 <i class="fa-solid fa-house"></i>
                 Home
             </a> -->
-            <a class="nav-btn logout" href="index.php">
+            <a class="nav-btn logout" href="logout.php">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 Logout
             </a>
@@ -215,25 +218,6 @@ $role = $user['role'];
 </div>
 
 <div class="wrap">
-    <!-- <div class="card">
-        <?php if ($msg = flash_get('success')): ?>
-            <div class="msg"><?php echo e($msg); ?></div>
-        <?php endif; ?>
-
-        <h1>Welcome, <?php echo e($user['name'] ?: $user['username']); ?></h1>
-
-        <div class="user-meta">
-            <div class="meta-item">
-                <i class="fa-solid fa-user-tag"></i>
-                Role: <?php echo e($user['role']); ?>
-            </div>
-            <div class="meta-item">
-                <i class="fa-solid fa-envelope"></i>
-                Email: <?php echo e($user['email']); ?>
-            </div>
-        </div>
-    </div> -->
-
     <?php if ($role === 'parent'): ?>
         <div class="card">
             <h2>Dashboard</h2>

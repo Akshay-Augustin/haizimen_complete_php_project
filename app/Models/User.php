@@ -92,4 +92,81 @@ class User
 
         return $user;
     }
+    public function createDoctorProfile(int $userId, array $data): void
+{
+    $stmt = $this->conn->prepare(
+        'INSERT INTO doctors (user_id, doctor_name, department, qualification, clinic_name, email, phone)
+         VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+
+    $doctorName = trim($data['firstname'] . ' ' . $data['lastname']);
+
+    $stmt->bind_param(
+        'issssss',
+        $userId,
+        $doctorName,
+        $data['department'],
+        $data['qualification'],
+        $data['clinic_name'],
+        $data['emailid'],
+        $data['phonenumber']
+    );
+
+    $stmt->execute();
+}
+  public function createCaretakerProfile(int $userId, array $data): void
+{
+    $stmt = $this->conn->prepare(
+        'INSERT INTO caretakers
+        (user_id, caretaker_name, experience_years, skills, availability, fee, preferred_location, email, phone)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+
+    $caretakerName = trim($data['firstname'] . ' ' . $data['lastname']);
+
+    $stmt->bind_param(
+        'issssssss',
+        $userId,
+        $caretakerName,
+        $data['experience_years'],
+        $data['skills'],
+        $data['availability'],
+        $data['fee'],
+        $data['preferred_location'],
+        $data['emailid'],
+        $data['phonenumber']
+    );
+
+    $stmt->execute();
+}
+public function createDaycareProfile(int $userId, array $data): void
+{
+    $stmt = $this->conn->prepare(
+        'INSERT INTO daycares
+        (user_id, center_name, manager_name, capacity, opening_time, closing_time, age_group_supported, facilities, description, email, phone, address)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+
+    $managerName = trim($data['firstname'] . ' ' . $data['lastname']);
+
+    $stmt->bind_param(
+        'ississssssss',
+        $userId,
+        $data['center_name'],
+        $managerName,
+        $data['capacity'],
+        $data['opening_time'],
+        $data['closing_time'],
+        $data['age_group_supported'],
+        $data['facilities'],
+        $data['daycare_description'],
+        $data['emailid'],
+        $data['phonenumber'],
+        $data['address']
+    );
+
+    $stmt->execute();
+}
+
+
 }

@@ -55,17 +55,137 @@ $vaccines = $conn->query("SELECT * FROM vaccines ORDER BY id DESC");
     <title>Admin - Vaccines</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body{margin:0;font-family:Arial;background:linear-gradient(to right,#081b2d,#0b1c2c);color:white;padding:30px}
-        .wrap{max-width:1150px;margin:auto}
-        .card{background:#10263d;padding:25px;border-radius:14px;margin-bottom:24px}
-        input, textarea, select{width:100%;padding:10px;margin-top:8px;margin-bottom:14px;border-radius:6px;border:1px solid #2c4966;background:#0b1c2c;color:white;box-sizing:border-box}
-        button{background:#ff5a3c;color:white;border:none;padding:10px 16px;border-radius:8px;font-weight:bold;cursor:pointer}
-        table{width:100%;border-collapse:collapse;background:#0b1c2c;border-radius:10px;overflow:hidden}
-        th,td{padding:14px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:left;vertical-align:top}
-        th{background:#0d2236}
-        a{color:#ff5a3c;text-decoration:none}
-        .msg{padding:12px 14px;background:rgba(80,200,120,.12);border:1px solid rgba(80,200,120,.35);border-radius:8px;margin-bottom:15px;color:#d8ffe5}
-        .err{padding:12px 14px;background:rgba(255,90,60,.12);border:1px solid rgba(255,90,60,.35);border-radius:8px;margin-bottom:15px;color:#ffd2ca}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f9ff;
+    color: #1b2b3a;
+    padding: 30px;
+}
+
+.wrap {
+    max-width: 1150px;
+    margin: auto;
+}
+
+.card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+h1, h2 {
+    margin-top: 0;
+    color: #1b6ec2;
+}
+
+/* FORM */
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    color: #1b2b3a;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+    border: 1px solid #cfe3f7;
+    background: #f9fcff;
+    color: #1b2b3a;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* BUTTON */
+button {
+    background: #1b6ec2;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #155a9c;
+}
+
+/* TABLE */
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 14px;
+    border-bottom: 1px solid #e6eef7;
+    text-align: left;
+    vertical-align: top;
+    font-size: 14px;
+}
+
+th {
+    background: #eaf4ff;
+    color: #1b6ec2;
+    font-weight: bold;
+}
+
+tr:hover {
+    background: #f4f9ff;
+}
+
+/* LINKS */
+a {
+    color: #1b6ec2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* MESSAGES */
+.msg {
+    padding: 12px 14px;
+    background: rgba(80,200,120,.12);
+    border: 1px solid rgba(80,200,120,.35);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    color: #2e7d32;
+}
+
+.err {
+    padding: 12px 14px;
+    background: rgba(255,90,60,.12);
+    border: 1px solid rgba(255,90,60,.35);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    color: #c62828;
+}
+
+/* BACK BUTTON */
+.back {
+    margin-top: 15px;
+    display: inline-block;
+}
     </style>
 </head>
 <body>
@@ -111,9 +231,10 @@ $vaccines = $conn->query("SELECT * FROM vaccines ORDER BY id DESC");
 
     <div class="card">
         <h2>All Vaccines</h2>
+        <div class="table-wrap">
         <table>
             <tr>
-                <th>ID</th>
+                <!-- <th>ID</th> -->
                 <th>Name</th>
                 <th>Age Group</th>
                 <th>Description</th>
@@ -122,7 +243,7 @@ $vaccines = $conn->query("SELECT * FROM vaccines ORDER BY id DESC");
             </tr>
             <?php while($row = $vaccines->fetch_assoc()): ?>
             <tr>
-                <td><?php echo (int)$row['id']; ?></td>
+                <!-- <td><?php echo (int)$row['id']; ?></td> -->
                 <td><?php echo e($row['vaccine_name']); ?></td>
                 <td><?php echo e($row['age_group']); ?></td>
                 <td><?php echo e($row['description']); ?></td>
@@ -131,7 +252,8 @@ $vaccines = $conn->query("SELECT * FROM vaccines ORDER BY id DESC");
             </tr>
             <?php endwhile; ?>
         </table>
-        <p><a href="admin_dashboard.php">Back to Admin Dashboard</a></p>
+        </div>
+        <p><a class="back" href="admin_dashboard.php">← Back to Dashboard</a></p>
     </div>
 
 </div>

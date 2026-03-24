@@ -25,36 +25,49 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #081b2d, #0b1c2c);
-            color: white;
+            background: #f4f9ff;
+            color: #1b2b3a;
             min-height: 100vh;
         }
 
         .topbar {
-            background: #071a2b;
+            background: #ffffff;
             padding: 16px 22px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .brand {
             font-size: 24px;
             font-weight: bold;
+            color: #1b6ec2;
+        }
+
+        .nav {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .nav a {
-            color: white;
+            color: #1b2b3a;
             text-decoration: none;
-            margin-left: 14px;
             padding: 10px 14px;
             border-radius: 8px;
-            background: rgba(255,255,255,0.06);
+            background: #eaf4ff;
+            font-weight: 600;
+            transition: 0.2s ease;
         }
 
         .nav a:hover {
-            background: #ff5a3c;
+            background: #1b6ec2;
+            color: white;
         }
 
         .wrap {
@@ -64,11 +77,22 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
         }
 
         .card {
-            background: #10263d;
+            background: #ffffff;
             border-radius: 16px;
             padding: 28px;
             margin-bottom: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.30);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .card h1,
+        .card h2 {
+            margin-top: 0;
+            color: #1b6ec2;
+        }
+
+        .card p {
+            color: #4a5c6b;
+            line-height: 1.7;
         }
 
         .grid {
@@ -78,25 +102,28 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
         }
 
         .stat {
-            background: #0b1c2c;
+            background: #f4f9ff;
             border-radius: 14px;
             padding: 22px;
+            border: 1px solid #d9ebfb;
         }
 
         .stat i {
             font-size: 28px;
-            color: #ff5a3c;
+            color: #1b6ec2;
             margin-bottom: 14px;
         }
 
         .stat h3 {
             margin: 0 0 8px;
             font-size: 18px;
+            color: #1b2b3a;
         }
 
         .stat .count {
             font-size: 30px;
             font-weight: bold;
+            color: #1b2b3a;
         }
 
         .actions {
@@ -106,29 +133,53 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
         }
 
         .action-box {
-            background: #0b1c2c;
+            background: #f4f9ff;
             border-radius: 14px;
             padding: 22px;
+            border: 1px solid #d9ebfb;
+            transition: 0.3s ease;
+        }
+
+        .action-box:hover {
+            transform: translateY(-4px);
+            background: #eaf4ff;
         }
 
         .action-box h3 {
             margin-top: 0;
+            color: #1b2b3a;
         }
 
         .action-box p {
-            color: #dbe6f2;
+            color: #4a5c6b;
             line-height: 1.6;
         }
 
         .btn {
             display: inline-block;
             margin-top: 12px;
-            background: #ff5a3c;
+            background: #1b6ec2;
             color: white;
             text-decoration: none;
             padding: 10px 16px;
             border-radius: 8px;
             font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #155a9c;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .nav {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -136,7 +187,6 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
     <div class="topbar">
         <div class="brand">Admin Dashboard</div>
         <div class="nav">
-            <a href="index.php"><i class="fa-solid fa-house"></i> Home</a>
             <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
     </div>
@@ -155,16 +205,19 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
                     <h3>Parents</h3>
                     <div class="count"><?php echo (int)$parentCount; ?></div>
                 </div>
+
                 <div class="stat">
                     <i class="fa-solid fa-user-doctor"></i>
                     <h3>Doctors</h3>
                     <div class="count"><?php echo (int)$doctorCount; ?></div>
                 </div>
+
                 <div class="stat">
                     <i class="fa-solid fa-calendar-check"></i>
                     <h3>Appointments</h3>
                     <div class="count"><?php echo (int)$appointmentCount; ?></div>
                 </div>
+
                 <div class="stat">
                     <i class="fa-solid fa-syringe"></i>
                     <h3>Vaccines</h3>

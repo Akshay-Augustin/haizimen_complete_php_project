@@ -9,206 +9,217 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
 
     <style>
-        html {
-            scroll-behavior: smooth;
-        }
+       html {
+    scroll-behavior: smooth;
+}
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #081b2d;
-            color: white;
-        }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f9ff;
+    color: #1b2b3a;
+}
 
-        .header {
-            background: #0b1c2c;
-            padding: 10px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+/* ===== HEADER ===== */
+.header {
+    background: #ffffff;
+    padding: 10px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
 
-        .navbar-nav .nav-link {
-            color: white !important;
-            margin-right: 15px;
-            font-weight: 500;
-        }
+.navbar-nav .nav-link {
+    color: #1b2b3a !important;
+    margin-right: 15px;
+    font-weight: 500;
+}
 
-        .navbar-nav .nav-link:hover {
-            color: #ff5a3c !important;
-        }
+.navbar-nav .nav-link:hover {
+    color: #1b6ec2 !important;
+}
 
-        .logo a {
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
-            text-decoration: none;
-        }
+.logo a {
+    color: #1b6ec2;
+    font-weight: bold;
+    font-size: 20px;
+    text-decoration: none;
+}
 
-        .hero {
-            min-height: 100vh;
-            background: linear-gradient(to right, #081b2d, #0b1c2c);
-            color: white;
-            display: flex;
-            align-items: center;
-            padding: 60px 0;
-        }
+/* ===== HERO ===== */
+.hero {
+    min-height: 100vh;
+    background: linear-gradient(to right, #eaf4ff, #d6ecff);
+    color: #1b2b3a;
+    display: flex;
+    align-items: center;
+    padding: 60px 0;
+}
 
-        .hero .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 40px;
-        }
+.hero .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
 
-        .hero-text h1 {
-            font-size: 70px;
-            font-weight: bold;
-            line-height: 1.1;
-        }
+.hero-text h1 {
+    font-size: 70px;
+    font-weight: bold;
+    line-height: 1.1;
+    color: #1b2b3a;
+}
 
-        .hero-text p {
-            width: 400px;
-            margin-top: 20px;
-            font-size: 20px;
-            line-height: 1.6;
-        }
+.hero-text p {
+    width: 400px;
+    margin-top: 20px;
+    font-size: 20px;
+    line-height: 1.6;
+    color: #4a5c6b;
+}
 
-        .hero-text a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 28px;
-            background: #ff5a3c;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+.hero-text a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 28px;
+    background: #1b6ec2;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+}
 
-        .hero-img img {
-            width: 420px;
-            max-width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-        }
+.hero-img img {
+    width: 420px;
+    max-width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
 
-        .about {
-            padding: 80px 0;
-            background: #10263d;
-        }
+/* ===== ABOUT ===== */
+.about {
+    padding: 80px 0;
+    background: #ffffff;
+}
 
-        .about h2,
-        .service h2,
-        .contact h2 {
-            font-size: 42px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #ffffff;
-        }
+.about h2,
+.service h2,
+.contact h2 {
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #1b6ec2;
+}
 
-        .about p,
-        .contact p {
-            font-size: 18px;
-            line-height: 1.8;
-            color: #dbe6f2;
-        }
+.about p,
+.contact p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #4a5c6b;
+}
 
-        .about .btn-primary,
-        .contact .btn-primary {
-            background: #ff5a3c;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 6px;
-            margin-top: 10px;
-        }
+.about .btn-primary,
+.contact .btn-primary {
+    background: #1b6ec2;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    margin-top: 10px;
+}
 
-        .about-gallery img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        }
+.about-gallery img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
 
-        .service {
-            padding: 80px 0;
-            background: #081b2d;
-        }
+/* ===== SERVICES ===== */
+.service {
+    padding: 80px 0;
+    background: #f4f9ff;
+}
 
-        .service-card {
-            background: #10263d;
-            border-radius: 16px;
-            padding: 30px 20px;
-            text-align: center;
-            transition: 0.3s ease;
-            height: 100%;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
+.service-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: 0.3s ease;
+    height: 100%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
 
-        .service-card:hover {
-            transform: translateY(-8px);
-            background: #15324f;
-        }
+.service-card:hover {
+    transform: translateY(-8px);
+    background: #eaf4ff;
+}
 
-        .service-card i {
-            font-size: 40px;
-            color: #ff5a3c;
-            margin-bottom: 15px;
-        }
+.service-card i {
+    font-size: 40px;
+    color: #1b6ec2;
+    margin-bottom: 15px;
+}
 
-        .service-card h4 {
-            color: white;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
+.service-card h4 {
+    color: #1b2b3a;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
 
-        .service-card p {
-            color: #dbe6f2;
-            margin: 0;
-        }
+.service-card p {
+    color: #4a5c6b;
+    margin: 0;
+}
 
-        .contact {
-            padding: 80px 0;
-            background: #10263d;
-            text-align: center;
-        }
+/* ===== CONTACT ===== */
+.contact {
+    padding: 80px 0;
+    background: #ffffff;
+    text-align: center;
+}
 
-        footer {
-            background: #0b1c2c;
-            color: white;
-            text-align: center;
-            padding: 18px;
-        }
+/* ===== FOOTER ===== */
+footer {
+    background: #1b6ec2;
+    color: white;
+    text-align: center;
+    padding: 18px;
+}
 
-        @media (max-width: 768px) {
-            .hero .container {
-                flex-direction: column;
-                text-align: center;
-            }
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+    .hero .container {
+        flex-direction: column;
+        text-align: center;
+    }
 
-            .hero-text h1 {
-                font-size: 42px;
-            }
+    .hero-text h1 {
+        font-size: 42px;
+    }
 
-            .hero-text p {
-                width: 100%;
-                font-size: 17px;
-            }
+    .hero-text p {
+        width: 100%;
+        font-size: 17px;
+    }
 
-            .hero-img img {
-                width: 260px;
-                margin-top: 20px;
-            }
+    .hero-img img {
+        width: 260px;
+        margin-top: 20px;
+    }
 
-            .about h2,
-            .service h2,
-            .contact h2 {
-                font-size: 32px;
-            }
-            .navbar-nav .nav-link.active {
-                color: #ff5a3c !important;
-            }
-        }
+    .about h2,
+    .service h2,
+    .contact h2 {
+        font-size: 32px;
+    }
+
+    .navbar-nav .nav-link.active {
+        color: #1b6ec2 !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -341,7 +352,7 @@
 </section>
 
 <footer>
-    <p>© 2025 Haizimen Center. All Rights Reserved.</p>
+    <p>© 2026 Haizimen Center. All Rights Reserved.</p>
 </footer>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

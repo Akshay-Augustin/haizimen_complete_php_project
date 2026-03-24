@@ -20,22 +20,87 @@ $result = $conn->query("
     <title>Admin - Doctors</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body{margin:0;font-family:Arial;background:linear-gradient(to right,#081b2d,#0b1c2c);color:white;padding:30px}
-        .wrap{max-width:1100px;margin:auto}
-        .card{background:#10263d;padding:25px;border-radius:14px}
-        table{width:100%;border-collapse:collapse;background:#0b1c2c;border-radius:10px;overflow:hidden}
-        th,td{padding:14px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:left}
-        th{background:#0d2236}
-        a{color:#ff5a3c;text-decoration:none}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f9ff;
+    color: #1b2b3a;
+    padding: 30px;
+}
+
+.wrap {
+    max-width: 1100px;
+    margin: auto;
+}
+
+.card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+h1 {
+    margin-top: 0;
+    color: #1b6ec2;
+}
+
+/* TABLE */
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #e6eef7;
+    font-size: 14px;
+}
+
+th {
+    background: #eaf4ff;
+    color: #1b6ec2;
+    font-weight: bold;
+}
+
+tr:hover {
+    background: #f4f9ff;
+}
+
+/* LINKS */
+a {
+    color: #1b6ec2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* BACK BUTTON */
+.back {
+    margin-top: 15px;
+    display: inline-block;
+}
     </style>
 </head>
 <body>
 <div class="wrap">
     <div class="card">
         <h1>Registered Doctors</h1>
+        <div class="table-wrap">
         <table>
             <tr>
-                <th>ID</th>
+                <!-- <th>ID</th> -->
                 <th>Doctor Name</th>
                 <th>Department</th>
                 <th>Email</th>
@@ -44,7 +109,7 @@ $result = $conn->query("
             </tr>
             <?php while($row = $result->fetch_assoc()): ?>
             <tr>
-                <td><?php echo (int)$row['id']; ?></td>
+                <!-- <td><?php echo (int)$row['id']; ?></td> -->
                 <td><?php echo e($row['doctor_name']); ?></td>
                 <td><?php echo e($row['department']); ?></td>
                 <td><?php echo e($row['email']); ?></td>
@@ -53,7 +118,8 @@ $result = $conn->query("
             </tr>
             <?php endwhile; ?>
         </table>
-        <p><a href="admin_dashboard.php">Back to Admin Dashboard</a></p>
+        </div>
+        <p><a class="back" href="admin_dashboard.php">← Back to Dashboard</a></p>
     </div>
 </div>
 </body>

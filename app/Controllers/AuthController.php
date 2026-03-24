@@ -33,23 +33,105 @@ class AuthController
             'phonenumber' => trim($_POST['phonenumber'] ?? ''),
             'username' => trim($_POST['username'] ?? ''),
             'uploadcertificate' => '',
+
+            // doctor
+            'department' => trim($_POST['department'] ?? ''),
+            'qualification' => trim($_POST['qualification'] ?? ''),
+            'clinic_name' => trim($_POST['clinic_name'] ?? ''),
+
+            // caretaker
+            'experience_years' => trim($_POST['experience_years'] ?? ''),
+            'skills' => trim($_POST['skills'] ?? ''),
+            'availability' => trim($_POST['availability'] ?? ''),
+            'fee' => trim($_POST['fee'] ?? ''),
+            'preferred_location' => trim($_POST['preferred_location'] ?? ''),
+
+            // daycare
+            'center_name' => trim($_POST['center_name'] ?? ''),
+            'capacity' => trim($_POST['capacity'] ?? ''),
+            'opening_time' => trim($_POST['opening_time'] ?? ''),
+            'closing_time' => trim($_POST['closing_time'] ?? ''),
+            'age_group_supported' => trim($_POST['age_group_supported'] ?? ''),
+            'facilities' => trim($_POST['facilities'] ?? ''),
+            'daycare_description' => trim($_POST['daycare_description'] ?? ''),
         ];
 
         $password = $_POST['password'] ?? '';
+
+        /*
+         * Daycare does not show personal fields in the form.
+         * But users table still requires first_name, last_name, gender, dob.
+         * So we provide safe defaults here.
+         */
+        if ($data['role'] === 'daycare') {
+            if ($data['firstname'] === '') {
+                $data['firstname'] = $data['center_name'] !== '' ? $data['center_name'] : 'Daycare';
+            }
+            if ($data['lastname'] === '') {
+                $data['lastname'] = 'Center';
+            }
+            if ($data['gender'] === '') {
+                $data['gender'] = 'others';
+            }
+            if ($data['DOB'] === '') {
+                $data['DOB'] = '2000-01-01';
+            }
+        }
 
         remember_old_input($data);
 
         $allowedRoles = ['parent', 'doctor', 'caretaker', 'daycare'];
 
-        if (!in_array($data['role'], $allowedRoles, true)) $errors[] = 'Please select a valid role.';
-        if ($data['firstname'] === '') $errors[] = 'First name is required.';
-        if ($data['lastname'] === '') $errors[] = 'Last name is required.';
-        if (!in_array($data['gender'], ['male', 'female', 'others'], true)) $errors[] = 'Gender is invalid.';
-        if ($data['DOB'] === '') $errors[] = 'Date of birth is required.';
-        if (!filter_var($data['emailid'], FILTER_VALIDATE_EMAIL)) $errors[] = 'Valid email is required.';
-        if ($data['username'] === '') $errors[] = 'Username is required.';
-        if (strlen($password) < 6) $errors[] = 'Password must be at least 6 characters.';
-        if ($data['phonenumber'] === '') $errors[] = 'Phone number is required.';
+        if (!in_array($data['role'], $allowedRoles, true)) {
+            $errors[] = 'Please select a valid role.';
+        }
+
+        if (!filter_var($data['emailid'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Valid email is required.';
+        }
+
+        if ($data['username'] === '') {
+            $errors[] = 'Username is required.';
+        }
+
+        if (strlen($password) < 6) {
+            $errors[] = 'Password must be at least 6 characters.';
+        }
+
+        if ($data['phonenumber'] === '') {
+            $errors[] = 'Phone number is required.';
+        }
+
+        // role-based validation
+        if ($data['role'] !== 'daycare') {
+            if ($data['firstname'] === '') {
+                $errors[] = 'First name is required.';
+            }
+
+            if ($data['lastname'] === '') {
+                $errors[] = 'Last name is required.';
+            }
+
+            if (!in_array($data['gender'], ['male', 'female', 'others'], true)) {
+                $errors[] = 'Gender is invalid.';
+            }
+
+            if ($data['DOB'] === '') {
+                $errors[] = 'Date of birth is required.';
+            }
+        }
+
+        if ($data['role'] === 'doctor' && $data['department'] === '') {
+            $errors[] = 'Department is required for doctor registration.';
+        }
+
+        if ($data['role'] === 'caretaker' && $data['experience_years'] === '') {
+            $errors[] = 'Experience is required for caretaker registration.';
+        }
+
+        if ($data['role'] === 'daycare' && $data['center_name'] === '') {
+            $errors[] = 'Center name is required for daycare registration.';
+        }
 
         if ($this->userModel->usernameExists($data['username'])) {
             $errors[] = 'Username already exists.';
@@ -75,6 +157,19 @@ class AuthController
         $data['password_hash'] = password_hash($password, PASSWORD_DEFAULT);
 
         $userId = $this->userModel->createUser($data);
+
+        if ($data['role'] === 'doctor') {
+            $this->userModel->createDoctorProfile($userId, $data);
+        }
+
+        if ($data['role'] === 'caretaker') {
+            $this->userModel->createCaretakerProfile($userId, $data);
+        }
+
+        if ($data['role'] === 'daycare') {
+            $this->userModel->createDaycareProfile($userId, $data);
+        }
+
         $this->userModel->createLegacyLogin($userId, $data['username'], $data['password_hash']);
 
         clear_old_input();
@@ -128,7 +223,7 @@ class AuthController
     public function logout(): void
     {
         unset($_SESSION['auth']);
-        flash_set('success', 'Logged out successfully.');
+        flash_set('Logged out successfully.');
     }
 
     private function handleCertificateUpload(array $file): array
