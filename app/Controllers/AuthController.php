@@ -33,7 +33,7 @@ class AuthController
             'phonenumber' => trim($_POST['phonenumber'] ?? ''),
             'username' => trim($_POST['username'] ?? ''),
             'uploadcertificate' => '',
-
+            'qualification_certificate' => '',
             // doctor
             'department' => trim($_POST['department'] ?? ''),
             'qualification' => trim($_POST['qualification'] ?? ''),
@@ -118,6 +118,14 @@ class AuthController
 
             if ($data['DOB'] === '') {
                 $errors[] = 'Date of birth is required.';
+            }
+        }
+        if (!empty($_FILES['qualification_certificate']['name'])) {
+            $upload = $this->handleCertificateUpload($_FILES['qualification_certificate']);
+            if (!empty($upload['error'])) {
+                $errors[] = $upload['error'];
+            } else {
+                $data['qualification_certificate'] = $upload['path'];
             }
         }
 

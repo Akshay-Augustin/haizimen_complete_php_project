@@ -31,18 +31,19 @@ class User
     {
         $stmt = $this->conn->prepare(
             'INSERT INTO users
-            (role, first_name, last_name, gender, dob, certificate_path, blood_group, height, weight, mother_name, father_name, address, email, phone, username, password_hash)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            (role, first_name, last_name, gender, dob, certificate_path, qualification_certificate, blood_group, height, weight, mother_name, father_name, address, email, phone, username, password_hash)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
 
         $stmt->bind_param(
-            'ssssssssssssssss',
+            'sssssssssssssssss',
             $data['role'],
             $data['firstname'],
             $data['lastname'],
             $data['gender'],
             $data['DOB'],
             $data['uploadcertificate'],
+            $data['qualification_certificate'],
             $data['bloodgroup'],
             $data['height'],
             $data['weight'],

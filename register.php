@@ -303,14 +303,21 @@ if (isset($_POST['submit'])) {
                 </tr>
 
                 <!-- Common -->
-                <tr>
+                <!-- Parent Only -->
+                <tr class="parent-only">
                     <td>Birth Certificate</td>
                     <td><input type="file" name="uploadcertificate"></td>
                 </tr>
 
-                <tr>
+                <tr class="parent-only">
                     <td>Blood Group</td>
                     <td><input type="text" name="bloodgroup" value="<?php echo e(old('bloodgroup')); ?>"></td>
+                </tr>
+
+                <!-- Doctor + Caretaker -->
+                <tr class="doctor-only caretaker-only">
+                    <td>Qualification Certificate</td>
+                    <td><input type="file" name="qualification_certificate"></td>
                 </tr>
 
                 <!-- Parent-only extra fields -->
@@ -384,7 +391,10 @@ function toggleRoleFields() {
     const daycareFields = document.querySelectorAll('.daycare-only');
     const personalFields = document.querySelectorAll('.personal-only');
     const parentExtraFields = document.querySelectorAll('.parent-extra-only');
+    const parentOnly = document.querySelectorAll('.parent-only');
 
+
+    parentOnly.forEach(field => field.style.display = 'none');
     doctorFields.forEach(field => field.style.display = 'none');
     caretakerFields.forEach(field => field.style.display = 'none');
     daycareFields.forEach(field => field.style.display = 'none');
@@ -392,18 +402,18 @@ function toggleRoleFields() {
     parentExtraFields.forEach(field => field.style.display = 'none');
 
     if (role === 'parent') {
-        personalFields.forEach(field => field.style.display = 'table-row');
-        // parent extra fields hidden as requested
+        personalFields.forEach(f => f.style.display = 'table-row');
+        parentOnly.forEach(f => f.style.display = 'table-row');
     }
 
     if (role === 'doctor') {
-        personalFields.forEach(field => field.style.display = 'table-row');
-        doctorFields.forEach(field => field.style.display = 'table-row');
+        personalFields.forEach(f => f.style.display = 'table-row');
+        doctorFields.forEach(f => f.style.display = 'table-row');
     }
 
     if (role === 'caretaker') {
-        personalFields.forEach(field => field.style.display = 'table-row');
-        caretakerFields.forEach(field => field.style.display = 'table-row');
+        personalFields.forEach(f => f.style.display = 'table-row');
+        caretakerFields.forEach(f => f.style.display = 'table-row');
     }
 
     if (role === 'daycare') {
