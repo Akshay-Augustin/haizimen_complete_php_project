@@ -54,9 +54,9 @@ body {
 /* LEFT IMAGE */
 .left {
     width: 50%;
-    background:
-        linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.3)),
-        url('https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=900&q=80') no-repeat center/cover;
+background:
+
+url('assets/images/bg.jpg') no-repeat center/cover;
     min-height: 520px;
 }
 
@@ -190,8 +190,11 @@ a {
                 <input type="password" name="password" placeholder="Enter Password" required>
                 <button name="login">Login</button>
             </form>
-
+            <p style="text-align:right; margin-top:5px;">
+                            <a href="forgot_password.php">Forgot Password?</a>
+                        </p>
             <p>Don't have an account? <a href="register.php">Register</a></p>
+
             <a class="back-home" href="index.php">Back to Home</a>
         </div>
     </div>

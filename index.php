@@ -265,7 +265,7 @@ footer {
         </div>
 
         <div class="hero-img">
-            <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=900&q=80" alt="baby care">
+            <img src="assets/images/bg.jpg" alt="baby care">
         </div>
     </div>
 </section>
@@ -276,13 +276,13 @@ footer {
             <div class="col-md-6 mb-4 mb-md-0">
                 <div class="row about-gallery">
                     <div class="col-12 mb-3">
-                        <img src="https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?auto=format&fit=crop&w=900&q=80" alt="child care">
+                        <img src="assets/images/bg1.jpg" alt="child care">
                     </div>
                     <div class="col-6">
-                        <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=900&q=80" alt="mother with baby">
+                        <img src="assets/images/bg2.jpg" alt="mother with baby">
                     </div>
                     <div class="col-6">
-                        <img src="https://images.unsplash.com/photo-1544126592-807ade215a0b?auto=format&fit=crop&w=900&q=80" alt="happy child">
+                        <img src="assets/images/bg3.jpg" alt="happy child">
                     </div>
                 </div>
             </div>

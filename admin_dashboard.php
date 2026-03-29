@@ -11,8 +11,15 @@ if ($user['role'] !== 'admin') {
 
 $parentCount = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role = 'parent'")->fetch_assoc()['total'] ?? 0;
 $doctorCount = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role = 'doctor'")->fetch_assoc()['total'] ?? 0;
+$caretakerCount = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role = 'caretaker'")->fetch_assoc()['total'] ?? 0;
+$daycareCount = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role = 'daycare'")->fetch_assoc()['total'] ?? 0;
+
 $appointmentCount = $conn->query("SELECT COUNT(*) AS total FROM appointments")->fetch_assoc()['total'] ?? 0;
 $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_assoc()['total'] ?? 0;
+$vaccineBookingCount = $conn->query("SELECT COUNT(*) AS total FROM vaccine_bookings")->fetch_assoc()['total'] ?? 0;
+
+$caretakerRequestCount = $conn->query("SELECT COUNT(*) AS total FROM caretaker_requests")->fetch_assoc()['total'] ?? 0;
+$daycareRequestCount = $conn->query("SELECT COUNT(*) AS total FROM daycare_requests")->fetch_assoc()['total'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -187,6 +194,7 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
     <div class="topbar">
         <div class="brand">Admin Dashboard</div>
         <div class="nav">
+            <!-- <a href="index.php"><i class="fa-solid fa-house"></i> Home</a> -->
             <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
     </div>
@@ -213,6 +221,18 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
                 </div>
 
                 <div class="stat">
+                    <i class="fa-solid fa-user-nurse"></i>
+                    <h3>Caretakers</h3>
+                    <div class="count"><?php echo (int)$caretakerCount; ?></div>
+                </div>
+
+                <div class="stat">
+                    <i class="fa-solid fa-school"></i>
+                    <h3>Daycares</h3>
+                    <div class="count"><?php echo (int)$daycareCount; ?></div>
+                </div>
+
+                <div class="stat">
                     <i class="fa-solid fa-calendar-check"></i>
                     <h3>Appointments</h3>
                     <div class="count"><?php echo (int)$appointmentCount; ?></div>
@@ -222,6 +242,24 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
                     <i class="fa-solid fa-syringe"></i>
                     <h3>Vaccines</h3>
                     <div class="count"><?php echo (int)$vaccineCount; ?></div>
+                </div>
+
+                <div class="stat">
+                    <i class="fa-solid fa-notes-medical"></i>
+                    <h3>Vaccine Bookings</h3>
+                    <div class="count"><?php echo (int)$vaccineBookingCount; ?></div>
+                </div>
+
+                <div class="stat">
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+                    <h3>Caretaker Requests</h3>
+                    <div class="count"><?php echo (int)$caretakerRequestCount; ?></div>
+                </div>
+
+                <div class="stat">
+                    <i class="fa-solid fa-building-circle-check"></i>
+                    <h3>Daycare Requests</h3>
+                    <div class="count"><?php echo (int)$daycareRequestCount; ?></div>
                 </div>
             </div>
         </div>
@@ -242,6 +280,18 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
                 </div>
 
                 <div class="action-box">
+                    <h3>View Caretakers</h3>
+                    <p>See all registered caretakers with their experience, skills, fee, and location.</p>
+                    <a class="btn" href="admin_caretakers.php">Open</a>
+                </div>
+
+                <div class="action-box">
+                    <h3>View Daycares</h3>
+                    <p>See all daycare centers, timings, capacity, and facilities.</p>
+                    <a class="btn" href="admin_daycares.php">Open</a>
+                </div>
+
+                <div class="action-box">
                     <h3>View Appointments</h3>
                     <p>Monitor all appointments booked between parents and doctors.</p>
                     <a class="btn" href="admin_appointments.php">Open</a>
@@ -251,6 +301,24 @@ $vaccineCount = $conn->query("SELECT COUNT(*) AS total FROM vaccines")->fetch_as
                     <h3>Manage Vaccines</h3>
                     <p>Add, edit, and manage vaccine details centrally.</p>
                     <a class="btn" href="admin_vaccines.php">Open</a>
+                </div>
+
+                <div class="action-box">
+                    <h3>Vaccine Bookings</h3>
+                    <p>Monitor all vaccine bookings made by parents and assigned to doctors.</p>
+                    <a class="btn" href="admin_vaccine_bookings.php">Open</a>
+                </div>
+
+                <div class="action-box">
+                    <h3>Caretaker Requests</h3>
+                    <p>Monitor caretaker service requests made by parents.</p>
+                    <a class="btn" href="admin_caretaker_requests.php">Open</a>
+                </div>
+
+                <div class="action-box">
+                    <h3>Daycare Requests</h3>
+                    <p>Monitor daycare requests and enrollment actions.</p>
+                    <a class="btn" href="admin_daycare_requests.php">Open</a>
                 </div>
             </div>
         </div>
