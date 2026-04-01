@@ -3,6 +3,15 @@ include("connect.php");
 require_once 'app/Controllers/AuthController.php';
 
 $errors = [];
+$hospitalRows = [];
+
+$hospitalQuery = $conn->query("SELECT id, hospital_name FROM hospitals ORDER BY hospital_name ASC");
+if ($hospitalQuery) {
+    while ($row = $hospitalQuery->fetch_assoc()) {
+        $hospitalRows[] = $row;
+    }
+}
+
 if (isset($_POST['submit'])) {
     $controller = new AuthController($conn);
     $result = $controller->registerUser();
@@ -21,7 +30,6 @@ if (isset($_POST['submit'])) {
     <meta charset="utf-8">
     <title>Register - Haizimen</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <style>
         body {
             margin: 0;
@@ -33,7 +41,6 @@ if (isset($_POST['submit'])) {
                 url('https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
             background-size: cover;
         }
-
         .page-wrap {
             min-height: 100vh;
             display: flex;
@@ -41,9 +48,8 @@ if (isset($_POST['submit'])) {
             justify-content: center;
             padding: 40px 15px;
         }
-
         .container {
-            width: 520px;
+            width: 620px;
             max-width: 100%;
             background: rgba(255, 255, 255, 0.96);
             padding: 24px;
@@ -51,32 +57,25 @@ if (isset($_POST['submit'])) {
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             border: 1px solid rgba(0,0,0,0.05);
         }
-
         h2 {
             text-align: center;
             font-size: 24px;
             margin-bottom: 8px;
             color: #1b6ec2;
         }
-
         .subtext {
             text-align: center;
             color: #4a5c6b;
             font-size: 14px;
             margin-bottom: 18px;
         }
-
-        table {
-            width: 100%;
-        }
-
+        table { width: 100%; }
         td {
             padding: 6px 4px;
             font-size: 13px;
             vertical-align: top;
             color: #4a5c6b;
         }
-
         select,
         textarea,
         input[type="text"],
@@ -96,24 +95,12 @@ if (isset($_POST['submit'])) {
             color: #1b2b3a;
             font-family: Arial, sans-serif;
         }
-
         textarea {
             resize: vertical;
             min-height: 80px;
         }
-
-        select {
-            appearance: none;
-        }
-
-        input[type="file"] {
-            padding: 7px;
-        }
-
-        input[type="radio"] {
-            margin-right: 4px;
-        }
-
+        input[type="file"] { padding: 7px; }
+        input[type="radio"] { margin-right: 4px; }
         .btn {
             width: 100%;
             padding: 11px;
@@ -126,24 +113,18 @@ if (isset($_POST['submit'])) {
             font-weight: bold;
             margin-top: 8px;
         }
-
-        .btn:hover {
-            background: #155a9c;
-        }
-
+        .btn:hover { background: #155a9c; }
         .login-link {
             text-align: center;
             font-size: 13px;
             margin-top: 12px;
             color: #4a5c6b;
         }
-
         a {
             text-decoration: none;
             color: #1b6ec2;
             font-weight: bold;
         }
-
         .alert {
             background: #ffecec;
             color: #a94442;
@@ -153,18 +134,18 @@ if (isset($_POST['submit'])) {
             margin-bottom: 15px;
             font-size: 13px;
         }
-
         .back-home {
             display: block;
             text-align: center;
             margin-top: 14px;
             font-size: 13px;
         }
-
         .doctor-only,
         .caretaker-only,
         .daycare-only,
+        .hospital-only,
         .personal-only,
+        .parent-only,
         .parent-extra-only {
             display: none;
         }
@@ -193,16 +174,17 @@ if (isset($_POST['submit'])) {
                             <option value="">Select Role</option>
                             <option value="parent" <?php echo old('role') === 'parent' ? 'selected' : ''; ?>>Parent</option>
                             <option value="doctor" <?php echo old('role') === 'doctor' ? 'selected' : ''; ?>>Doctor</option>
+                            <option value="hospital" <?php echo old('role') === 'hospital' ? 'selected' : ''; ?>>Hospital</option>
                             <option value="caretaker" <?php echo old('role') === 'caretaker' ? 'selected' : ''; ?>>Caretaker</option>
                             <option value="daycare" <?php echo old('role') === 'daycare' ? 'selected' : ''; ?>>Daycare</option>
                         </select>
                     </td>
                 </tr>
 
-                <!-- Doctor fields -->
+                <!-- Doctor -->
                 <tr class="doctor-only">
                     <td>Department</td>
-                    <td><input type="text" id="department" name="department" value="<?php echo e(old('department')); ?>"></td>
+                    <td><input type="text" id="department" name="department" value="Pediatrics" readonly></td>
                 </tr>
 
                 <tr class="doctor-only">
@@ -211,11 +193,81 @@ if (isset($_POST['submit'])) {
                 </tr>
 
                 <tr class="doctor-only">
-                    <td>Clinic / Hospital Name</td>
-                    <td><input type="text" id="clinic_name" name="clinic_name" value="<?php echo e(old('clinic_name')); ?>"></td>
+                    <td>Select Hospital</td>
+                    <td>
+                        <select id="hospital_id" name="hospital_id">
+                            <option value="">Choose Hospital</option>
+                            <?php foreach ($hospitalRows as $hospital): ?>
+                                <option value="<?php echo (int)$hospital['id']; ?>" <?php echo old('hospital_id') == $hospital['id'] ? 'selected' : ''; ?>>
+                                    <?php echo e($hospital['hospital_name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
                 </tr>
 
-                <!-- Caretaker fields -->
+                <!-- Hospital -->
+                <tr class="hospital-only">
+                    <td>Hospital Name</td>
+                    <td><input type="text" id="hospital_name" name="hospital_name" value="<?php echo e(old('hospital_name')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>Registration Number</td>
+                    <td><input type="text" id="registration_number" name="registration_number" value="<?php echo e(old('registration_number')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>Hospital Type</td>
+                    <td>
+                        <select id="hospital_type" name="hospital_type">
+                            <option value="">Choose Type</option>
+                            <option value="General">General</option>
+                            <option value="Children">Children</option>
+                            <option value="Multispeciality">Multispeciality</option>
+                            <option value="Clinic">Clinic</option>
+                            <option value="Government">Government</option>
+                            <option value="Private">Private</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>Contact Person</td>
+                    <td><input type="text" id="contact_person" name="contact_person" value="<?php echo e(old('contact_person')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>Opening Time</td>
+                    <td><input type="time" id="hospital_opening_time" name="hospital_opening_time" value="<?php echo e(old('hospital_opening_time')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>Closing Time</td>
+                    <td><input type="time" id="hospital_closing_time" name="hospital_closing_time" value="<?php echo e(old('hospital_closing_time')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>City</td>
+                    <td><input type="text" id="city" name="city" value="<?php echo e(old('city')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>State</td>
+                    <td><input type="text" id="state" name="state" value="<?php echo e(old('state')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>Pincode</td>
+                    <td><input type="text" id="pincode" name="pincode" value="<?php echo e(old('pincode')); ?>"></td>
+                </tr>
+
+                <tr class="hospital-only">
+                    <td>Description</td>
+                    <td><textarea id="hospital_description" name="hospital_description"><?php echo e(old('hospital_description')); ?></textarea></td>
+                </tr>
+
+                <!-- Caretaker -->
                 <tr class="caretaker-only">
                     <td>Experience (Years)</td>
                     <td><input type="text" id="experience_years" name="experience_years" value="<?php echo e(old('experience_years')); ?>"></td>
@@ -241,7 +293,7 @@ if (isset($_POST['submit'])) {
                     <td><input type="text" id="preferred_location" name="preferred_location" value="<?php echo e(old('preferred_location')); ?>"></td>
                 </tr>
 
-                <!-- Daycare fields -->
+                <!-- Daycare -->
                 <tr class="daycare-only">
                     <td>Center Name</td>
                     <td><input type="text" id="center_name" name="center_name" value="<?php echo e(old('center_name')); ?>"></td>
@@ -277,7 +329,7 @@ if (isset($_POST['submit'])) {
                     <td><textarea id="daycare_description" name="daycare_description"><?php echo e(old('daycare_description')); ?></textarea></td>
                 </tr>
 
-                <!-- Personal fields -->
+                <!-- Personal -->
                 <tr class="personal-only">
                     <td>First Name</td>
                     <td><input type="text" id="firstname" name="firstname" value="<?php echo e(old('firstname')); ?>"></td>
@@ -302,8 +354,6 @@ if (isset($_POST['submit'])) {
                     <td><input type="date" id="DOB" name="DOB" value="<?php echo e(old('DOB')); ?>"></td>
                 </tr>
 
-                <!-- Common -->
-                <!-- Parent Only -->
                 <tr class="parent-only">
                     <td>Birth Certificate</td>
                     <td><input type="file" name="uploadcertificate"></td>
@@ -314,13 +364,11 @@ if (isset($_POST['submit'])) {
                     <td><input type="text" name="bloodgroup" value="<?php echo e(old('bloodgroup')); ?>"></td>
                 </tr>
 
-                <!-- Doctor + Caretaker -->
-                <tr class="doctor-only caretaker-only">
-                    <td>Qualification Certificate</td>
+                <tr class="doctor-only caretaker-only hospital-only">
+                    <td>Qualification / License Certificate</td>
                     <td><input type="file" name="qualification_certificate"></td>
                 </tr>
 
-                <!-- Parent-only extra fields -->
                 <tr class="parent-extra-only">
                     <td>Height</td>
                     <td><input type="text" name="height" value="<?php echo e(old('height')); ?>"></td>
@@ -353,7 +401,7 @@ if (isset($_POST['submit'])) {
 
                 <tr>
                     <td>Phone</td>
-                    <td><input type="text" name="phonenumber" value="<?php echo e(old('phonenumber')); ?>" placeholder="+91XXXXXXXXXX" required></td>
+                    <td><input type="text" name="phonenumber" value="<?php echo e(old('phonenumber')); ?>" required></td>
                 </tr>
 
                 <tr>
@@ -389,15 +437,16 @@ function toggleRoleFields() {
     const doctorFields = document.querySelectorAll('.doctor-only');
     const caretakerFields = document.querySelectorAll('.caretaker-only');
     const daycareFields = document.querySelectorAll('.daycare-only');
+    const hospitalFields = document.querySelectorAll('.hospital-only');
     const personalFields = document.querySelectorAll('.personal-only');
     const parentExtraFields = document.querySelectorAll('.parent-extra-only');
     const parentOnly = document.querySelectorAll('.parent-only');
-
 
     parentOnly.forEach(field => field.style.display = 'none');
     doctorFields.forEach(field => field.style.display = 'none');
     caretakerFields.forEach(field => field.style.display = 'none');
     daycareFields.forEach(field => field.style.display = 'none');
+    hospitalFields.forEach(field => field.style.display = 'none');
     personalFields.forEach(field => field.style.display = 'none');
     parentExtraFields.forEach(field => field.style.display = 'none');
 
@@ -418,21 +467,28 @@ function toggleRoleFields() {
 
     if (role === 'daycare') {
         daycareFields.forEach(field => field.style.display = 'table-row');
-        // hide firstname to fathername as requested
+    }
+
+    if (role === 'hospital') {
+        hospitalFields.forEach(field => field.style.display = 'table-row');
     }
 
     const dept = document.getElementById('department');
+    const hospitalId = document.getElementById('hospital_id');
+    const hospitalName = document.getElementById('hospital_name');
     const centerName = document.getElementById('center_name');
     const firstname = document.getElementById('firstname');
     const lastname = document.getElementById('lastname');
     const dob = document.getElementById('DOB');
 
     if (dept) dept.required = role === 'doctor';
+    if (hospitalId) hospitalId.required = role === 'doctor';
+    if (hospitalName) hospitalName.required = role === 'hospital';
     if (centerName) centerName.required = role === 'daycare';
 
-    if (firstname) firstname.required = role !== 'daycare';
-    if (lastname) lastname.required = role !== 'daycare';
-    if (dob) dob.required = role !== 'daycare';
+    if (firstname) firstname.required = role === 'parent' || role === 'doctor' || role === 'caretaker';
+    if (lastname) lastname.required = role === 'parent' || role === 'doctor' || role === 'caretaker';
+    if (dob) dob.required = role === 'parent' || role === 'doctor' || role === 'caretaker';
 }
 
 document.addEventListener('DOMContentLoaded', function () {

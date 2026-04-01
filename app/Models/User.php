@@ -93,81 +93,125 @@ class User
 
         return $user;
     }
+
+    // =========================
+    // DOCTOR
+    // =========================
     public function createDoctorProfile(int $userId, array $data): void
-{
-    $stmt = $this->conn->prepare(
-        'INSERT INTO doctors (user_id, doctor_name, department, qualification, clinic_name, email, phone)
-         VALUES (?, ?, ?, ?, ?, ?, ?)'
-    );
+    {
+        $stmt = $this->conn->prepare(
+            'INSERT INTO doctors 
+            (user_id, doctor_name, department, qualification, hospital_id, email, phone)
+            VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
 
-    $doctorName = trim($data['firstname'] . ' ' . $data['lastname']);
+        $doctorName = trim($data['firstname'] . ' ' . $data['lastname']);
 
-    $stmt->bind_param(
-        'issssss',
-        $userId,
-        $doctorName,
-        $data['department'],
-        $data['qualification'],
-        $data['clinic_name'],
-        $data['emailid'],
-        $data['phonenumber']
-    );
+        $stmt->bind_param(
+            'isssiss',
+            $userId,
+            $doctorName,
+            $data['department'],
+            $data['qualification'],
+            $data['hospital_id'], // ✅ NEW
+            $data['emailid'],
+            $data['phonenumber']
+        );
 
-    $stmt->execute();
-}
-  public function createCaretakerProfile(int $userId, array $data): void
-{
-    $stmt = $this->conn->prepare(
-        'INSERT INTO caretakers
-        (user_id, caretaker_name, experience_years, skills, availability, fee, preferred_location, email, phone)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    );
+        $stmt->execute();
+    }
 
-    $caretakerName = trim($data['firstname'] . ' ' . $data['lastname']);
+    // =========================
+    // HOSPITAL
+    // =========================
+    public function createHospitalProfile(int $userId, array $data): void
+    {
+        $stmt = $this->conn->prepare(
+            'INSERT INTO hospitals
+            (user_id, hospital_name, registration_number, hospital_type, contact_person,
+             email, phone, address, city, state, pincode, opening_time, closing_time, description)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
 
-    $stmt->bind_param(
-        'issssssss',
-        $userId,
-        $caretakerName,
-        $data['experience_years'],
-        $data['skills'],
-        $data['availability'],
-        $data['fee'],
-        $data['preferred_location'],
-        $data['emailid'],
-        $data['phonenumber']
-    );
+        $stmt->bind_param(
+            'isssssssssssss',
+            $userId,
+            $data['hospital_name'],
+            $data['registration_number'],
+            $data['hospital_type'],
+            $data['contact_person'],
+            $data['emailid'],
+            $data['phonenumber'],
+            $data['address'],
+            $data['city'],
+            $data['state'],
+            $data['pincode'],
+            $data['hospital_opening_time'],
+            $data['hospital_closing_time'],
+            $data['hospital_description']
+        );
 
-    $stmt->execute();
-}
-public function createDaycareProfile(int $userId, array $data): void
-{
-    $stmt = $this->conn->prepare(
-        'INSERT INTO daycares
-        (user_id, center_name, manager_name, capacity, opening_time, closing_time, age_group_supported, facilities, description, email, phone, address)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    );
+        $stmt->execute();
+    }
 
-    $managerName = trim($data['firstname'] . ' ' . $data['lastname']);
+    // =========================
+    // CARETAKER
+    // =========================
+    public function createCaretakerProfile(int $userId, array $data): void
+    {
+        $stmt = $this->conn->prepare(
+            'INSERT INTO caretakers
+            (user_id, caretaker_name, experience_years, skills, availability, fee, preferred_location, email, phone)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
 
-    $stmt->bind_param(
-        'ississssssss',
-        $userId,
-        $data['center_name'],
-        $managerName,
-        $data['capacity'],
-        $data['opening_time'],
-        $data['closing_time'],
-        $data['age_group_supported'],
-        $data['facilities'],
-        $data['daycare_description'],
-        $data['emailid'],
-        $data['phonenumber'],
-        $data['address']
-    );
+        $caretakerName = trim($data['firstname'] . ' ' . $data['lastname']);
 
-    $stmt->execute();
-}
+        $stmt->bind_param(
+            'issssssss',
+            $userId,
+            $caretakerName,
+            $data['experience_years'],
+            $data['skills'],
+            $data['availability'],
+            $data['fee'],
+            $data['preferred_location'],
+            $data['emailid'],
+            $data['phonenumber']
+        );
 
+        $stmt->execute();
+    }
 
+    // =========================
+    // DAYCARE
+    // =========================
+    public function createDaycareProfile(int $userId, array $data): void
+    {
+        $stmt = $this->conn->prepare(
+            'INSERT INTO daycares
+            (user_id, center_name, manager_name, capacity, opening_time, closing_time, age_group_supported, facilities, description, email, phone, address)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+
+        $managerName = trim($data['firstname'] . ' ' . $data['lastname']);
+
+        $stmt->bind_param(
+            'ississssssss',
+            $userId,
+            $data['center_name'],
+            $managerName,
+            $data['capacity'],
+            $data['opening_time'],
+            $data['closing_time'],
+            $data['age_group_supported'],
+            $data['facilities'],
+            $data['daycare_description'],
+            $data['emailid'],
+            $data['phonenumber'],
+            $data['address']
+        );
+
+        $stmt->execute();
+    }
 }

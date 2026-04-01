@@ -34,10 +34,24 @@ class AuthController
             'username' => trim($_POST['username'] ?? ''),
             'uploadcertificate' => '',
             'qualification_certificate' => '',
+
             // doctor
             'department' => trim($_POST['department'] ?? ''),
             'qualification' => trim($_POST['qualification'] ?? ''),
             'clinic_name' => trim($_POST['clinic_name'] ?? ''),
+            'hospital_id' => (int)($_POST['hospital_id'] ?? 0),
+
+            // hospital
+            'hospital_name' => trim($_POST['hospital_name'] ?? ''),
+            'registration_number' => trim($_POST['registration_number'] ?? ''),
+            'hospital_type' => trim($_POST['hospital_type'] ?? ''),
+            'contact_person' => trim($_POST['contact_person'] ?? ''),
+            'hospital_opening_time' => trim($_POST['hospital_opening_time'] ?? ''),
+            'hospital_closing_time' => trim($_POST['hospital_closing_time'] ?? ''),
+            'city' => trim($_POST['city'] ?? ''),
+            'state' => trim($_POST['state'] ?? ''),
+            'pincode' => trim($_POST['pincode'] ?? ''),
+            'hospital_description' => trim($_POST['hospital_description'] ?? ''),
 
             // caretaker
             'experience_years' => trim($_POST['experience_years'] ?? ''),
@@ -78,9 +92,28 @@ class AuthController
             }
         }
 
+        /*
+         * Hospital also does not show personal fields in the form.
+         * So we provide safe defaults here.
+         */
+        if ($data['role'] === 'hospital') {
+            if ($data['firstname'] === '') {
+                $data['firstname'] = $data['hospital_name'] !== '' ? $data['hospital_name'] : 'Hospital';
+            }
+            if ($data['lastname'] === '') {
+                $data['lastname'] = 'Admin';
+            }
+            if ($data['gender'] === '') {
+                $data['gender'] = 'others';
+            }
+            if ($data['DOB'] === '') {
+                $data['DOB'] = '2000-01-01';
+            }
+        }
+
         remember_old_input($data);
 
-        $allowedRoles = ['parent', 'doctor', 'caretaker', 'daycare'];
+        $allowedRoles = ['parent', 'doctor', 'hospital', 'caretaker', 'daycare'];
 
         if (!in_array($data['role'], $allowedRoles, true)) {
             $errors[] = 'Please select a valid role.';
@@ -102,8 +135,8 @@ class AuthController
             $errors[] = 'Phone number is required.';
         }
 
-        // role-based validation
-        if ($data['role'] !== 'daycare') {
+        // role-based validation for roles that require personal fields
+        if (!in_array($data['role'], ['daycare', 'hospital'], true)) {
             if ($data['firstname'] === '') {
                 $errors[] = 'First name is required.';
             }
@@ -120,6 +153,7 @@ class AuthController
                 $errors[] = 'Date of birth is required.';
             }
         }
+
         if (!empty($_FILES['qualification_certificate']['name'])) {
             $upload = $this->handleCertificateUpload($_FILES['qualification_certificate']);
             if (!empty($upload['error'])) {
@@ -131,6 +165,22 @@ class AuthController
 
         if ($data['role'] === 'doctor' && $data['department'] === '') {
             $errors[] = 'Department is required for doctor registration.';
+        }
+
+        if ($data['role'] === 'doctor' && $data['hospital_id'] <= 0) {
+            $errors[] = 'Hospital selection is required for doctor registration.';
+        }
+
+        if ($data['role'] === 'hospital' && $data['hospital_name'] === '') {
+            $errors[] = 'Hospital name is required for hospital registration.';
+        }
+
+        if ($data['role'] === 'hospital' && $data['registration_number'] === '') {
+            $errors[] = 'Registration number is required for hospital registration.';
+        }
+
+        if ($data['role'] === 'hospital' && $data['contact_person'] === '') {
+            $errors[] = 'Contact person is required for hospital registration.';
         }
 
         if ($data['role'] === 'caretaker' && $data['experience_years'] === '') {
@@ -168,6 +218,10 @@ class AuthController
 
         if ($data['role'] === 'doctor') {
             $this->userModel->createDoctorProfile($userId, $data);
+        }
+
+        if ($data['role'] === 'hospital') {
+            $this->userModel->createHospitalProfile($userId, $data);
         }
 
         if ($data['role'] === 'caretaker') {

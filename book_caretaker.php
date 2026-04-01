@@ -22,12 +22,64 @@ if (!$caretaker) {
     die('Caretaker not found.');
 }
 
+/*
+Assumption:
+caretaker_availability.caretaker_user_id stores users.id
+and caretakers.user_id links to that user id
+*/
+$caretakerUserId = (int)($caretaker['user_id'] ?? 0);
+
+$availabilityLines = [];
+if ($caretakerUserId > 0) {
+    $stmt = $conn->prepare("
+        SELECT day_name, is_available, start_time, end_time
+        FROM caretaker_availability
+        WHERE caretaker_user_id = ?
+        ORDER BY FIELD(day_name, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+    ");
+    $stmt->bind_param("i", $caretakerUserId);
+    $stmt->execute();
+    $availabilityResult = $stmt->get_result();
+
+    while ($row = $availabilityResult->fetch_assoc()) {
+        if ((int)$row['is_available'] === 1) {
+            $availabilityLines[] = $row['day_name'] . ': ' .
+                date('g:i A', strtotime($row['start_time'])) . ' to ' .
+                date('g:i A', strtotime($row['end_time']));
+        } else {
+            $availabilityLines[] = $row['day_name'] . ': Not Available';
+        }
+    }
+}
+
+$availabilityText = !empty($availabilityLines)
+    ? implode("\n", $availabilityLines)
+    : 'Availability not updated yet';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $request_date = trim($_POST['request_date'] ?? '');
     $notes = trim($_POST['notes'] ?? '');
 
     if ($request_date === '') {
         $errors[] = 'Request date is required.';
+    }
+
+    if (!$errors && $caretakerUserId > 0) {
+        $day_name = date('l', strtotime($request_date));
+
+        $stmt = $conn->prepare("
+            SELECT is_available, start_time, end_time
+            FROM caretaker_availability
+            WHERE caretaker_user_id = ? AND day_name = ?
+            LIMIT 1
+        ");
+        $stmt->bind_param("is", $caretakerUserId, $day_name);
+        $stmt->execute();
+        $availabilityRow = $stmt->get_result()->fetch_assoc();
+
+        if (!$availabilityRow || (int)$availabilityRow['is_available'] !== 1) {
+            $errors[] = "Caretaker is not available on $day_name.";
+        }
     }
 
     if (!$errors) {
@@ -60,6 +112,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .error { background:#ffecec; border:1px solid #f5c6cb; color:#a94442; }
         .success { background:#e8fff1; border:1px solid #aad7b7; color:#1e6c35; }
         .back-link { color:#1b6ec2; text-decoration:none; font-weight:bold; }
+        .availability-note {
+            margin-top: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #fff9e8;
+            border: 1px solid #f0d98a;
+            color: #6a5800;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
@@ -70,6 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p><strong>Experience:</strong> <?php echo e($caretaker['experience_years'] ?: '-'); ?></p>
         <p><strong>Fee:</strong> <?php echo e($caretaker['fee'] ?: '-'); ?></p>
         <p><strong>Availability:</strong> <?php echo e($caretaker['availability'] ?: '-'); ?></p>
+
+        <div class="availability-note">
+            <strong>Weekly Availability:</strong><br>
+            <?php echo nl2br(e($availabilityText)); ?>
+        </div>
 
         <?php if ($success): ?>
             <div class="alert success"><?php echo e($success); ?></div>

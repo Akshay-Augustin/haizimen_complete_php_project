@@ -5,51 +5,55 @@ ensure_auth();
 
 $user = $_SESSION['auth'];
 
-if ($user['role'] !== 'doctor') {
+if ($user['role'] !== 'hospital') {
     die('Access denied.');
 }
 
-$doctorStmt = $conn->prepare("
-    SELECT d.*, h.hospital_name
-    FROM doctors d
-    LEFT JOIN hospitals h ON d.hospital_id = h.id
-    WHERE d.user_id = ?
-    LIMIT 1
-");
-$doctorStmt->bind_param("i", $user['id']);
-$doctorStmt->execute();
-$doctor = $doctorStmt->get_result()->fetch_assoc();
+$hospitalStmt = $conn->prepare("SELECT * FROM hospitals WHERE user_id = ? LIMIT 1");
+$hospitalStmt->bind_param("i", $user['id']);
+$hospitalStmt->execute();
+$hospital = $hospitalStmt->get_result()->fetch_assoc();
 
-if (!$doctor) {
-    die('Doctor profile not found.');
+if (!$hospital) {
+    die('Hospital profile not found.');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $booking_id = (int)($_POST['booking_id'] ?? 0);
+    $hospital_status = trim($_POST['hospital_status'] ?? '');
 
-    if ($booking_id > 0) {
+    if ($booking_id > 0 && in_array($hospital_status, ['approved', 'rejected', 'completed'], true)) {
+        $overall_status = $hospital_status === 'approved' ? 'approved' : ($hospital_status === 'rejected' ? 'rejected' : 'completed');
+
         $updateStmt = $conn->prepare("
             UPDATE vaccine_bookings
-            SET hospital_id = ?, hospital_status = 'pending', sent_to_hospital_at = NOW()
-            WHERE id = ? AND doctor_id = ?
+            SET hospital_status = ?, status = ?
+            WHERE id = ? AND hospital_id = ?
         ");
-        $updateStmt->bind_param("iii", $doctor['hospital_id'], $booking_id, $doctor['id']);
+        $updateStmt->bind_param("ssii", $hospital_status, $overall_status, $booking_id, $hospital['id']);
         $updateStmt->execute();
 
-        header("Location: doctor_vaccine_bookings.php");
+        header("Location: hospital_vaccine_requests.php");
         exit;
     }
 }
 
 $stmt = $conn->prepare("
-    SELECT vb.*, u.first_name, u.last_name, v.vaccine_name, v.age_group
+    SELECT 
+        vb.*, 
+        u.first_name, 
+        u.last_name, 
+        v.vaccine_name, 
+        v.age_group,
+        d.doctor_name
     FROM vaccine_bookings vb
     INNER JOIN users u ON vb.parent_user_id = u.id
     INNER JOIN vaccines v ON vb.vaccine_id = v.id
-    WHERE vb.doctor_id = ?
+    INNER JOIN doctors d ON vb.doctor_id = d.id
+    WHERE vb.hospital_id = ?
     ORDER BY vb.booking_date DESC
 ");
-$stmt->bind_param("i", $doctor['id']);
+$stmt->bind_param("i", $hospital['id']);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
@@ -57,7 +61,7 @@ $result = $stmt->get_result();
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Doctor Vaccine Bookings</title>
+    <title>Hospital Vaccine Requests</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body { margin:0; font-family:Arial,sans-serif; background:#f4f9ff; color:#1b2b3a; padding:40px 20px; }
@@ -76,12 +80,14 @@ $result = $stmt->get_result();
         .status.rejected { background:#f8d7da; color:#721c24; }
         .status.completed { background:#d1ecf1; color:#0c5460; }
         .status.not_sent { background:#ececec; color:#444; }
-        .actions { margin-top:12px; }
-        .actions form { display:inline-block; }
+        .actions form { display:inline-block; margin-right:8px; margin-top:8px; }
         button {
             padding:8px 12px; border:none; border-radius:6px;
-            font-weight:bold; cursor:pointer; color:white; background:#1b6ec2;
+            font-weight:bold; cursor:pointer; color:#fff;
         }
+        .btn-approve { background:#28a745; }
+        .btn-reject { background:#dc3545; }
+        .btn-complete { background:#17a2b8; }
         .back-link {
             display:inline-block; margin-top:6px; color:#1b6ec2;
             text-decoration:none; font-weight:bold;
@@ -91,15 +97,17 @@ $result = $stmt->get_result();
 <body>
 <div class="wrap">
     <div class="card">
-        <h1>Doctor Vaccine Bookings</h1>
-        <p><strong>Linked Hospital:</strong> <?php echo e($doctor['hospital_name'] ?: 'Not assigned'); ?></p>
+        <h1>Hospital Vaccine Requests</h1>
+        <p><strong>Hospital:</strong> <?php echo e($hospital['hospital_name']); ?></p>
 
         <?php if ($result && $result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="item">
                     <h3><?php echo e($row['vaccine_name']); ?> (<?php echo e($row['age_group']); ?>)</h3>
                     <p><strong>Parent:</strong> <span class="muted"><?php echo e($row['first_name'] . ' ' . $row['last_name']); ?></span></p>
+                    <p><strong>Doctor:</strong> <span class="muted"><?php echo e($row['doctor_name']); ?></span></p>
                     <p><strong>Booking Date:</strong> <span class="muted"><?php echo e($row['booking_date']); ?></span></p>
+
                     <p><strong>Overall Status:</strong>
                         <span class="status <?php echo e($row['status']); ?>"><?php echo e($row['status']); ?></span>
                     </p>
@@ -111,18 +119,33 @@ $result = $stmt->get_result();
                         <p><strong>Notes:</strong> <span class="muted"><?php echo e($row['notes']); ?></span></p>
                     <?php endif; ?>
 
-                    <?php if ((int)$doctor['hospital_id'] > 0 && $row['hospital_status'] === 'not_sent'): ?>
-                        <div class="actions">
+                    <div class="actions">
+                        <?php if ($row['hospital_status'] === 'pending'): ?>
                             <form method="POST">
                                 <input type="hidden" name="booking_id" value="<?php echo (int)$row['id']; ?>">
-                                <button type="submit">Send to Hospital</button>
+                                <input type="hidden" name="hospital_status" value="approved">
+                                <button type="submit" class="btn-approve">Approve</button>
                             </form>
-                        </div>
-                    <?php endif; ?>
+
+                            <form method="POST">
+                                <input type="hidden" name="booking_id" value="<?php echo (int)$row['id']; ?>">
+                                <input type="hidden" name="hospital_status" value="rejected">
+                                <button type="submit" class="btn-reject">Reject</button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($row['hospital_status'] === 'approved'): ?>
+                            <form method="POST">
+                                <input type="hidden" name="booking_id" value="<?php echo (int)$row['id']; ?>">
+                                <input type="hidden" name="hospital_status" value="completed">
+                                <button type="submit" class="btn-complete">Mark Completed</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <p>No vaccine bookings found.</p>
+            <p>No hospital vaccine requests found.</p>
         <?php endif; ?>
     </div>
 

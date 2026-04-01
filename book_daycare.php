@@ -22,6 +22,40 @@ if (!$daycare) {
     die('Daycare not found.');
 }
 
+/*
+Assumption:
+daycare_availability.daycare_user_id stores users.id
+and daycares.user_id links to that user id
+*/
+$daycareUserId = (int)($daycare['user_id'] ?? 0);
+
+$availabilityLines = [];
+if ($daycareUserId > 0) {
+    $stmt = $conn->prepare("
+        SELECT day_name, is_available, start_time, end_time
+        FROM daycare_availability
+        WHERE daycare_user_id = ?
+        ORDER BY FIELD(day_name, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+    ");
+    $stmt->bind_param("i", $daycareUserId);
+    $stmt->execute();
+    $availabilityResult = $stmt->get_result();
+
+    while ($row = $availabilityResult->fetch_assoc()) {
+        if ((int)$row['is_available'] === 1) {
+            $availabilityLines[] = $row['day_name'] . ': ' .
+                date('g:i A', strtotime($row['start_time'])) . ' to ' .
+                date('g:i A', strtotime($row['end_time']));
+        } else {
+            $availabilityLines[] = $row['day_name'] . ': Closed';
+        }
+    }
+}
+
+$availabilityText = !empty($availabilityLines)
+    ? implode("\n", $availabilityLines)
+    : 'Availability not updated yet';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $request_date = trim($_POST['request_date'] ?? '');
     $child_age = trim($_POST['child_age'] ?? '');
@@ -29,6 +63,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($request_date === '') {
         $errors[] = 'Request date is required.';
+    }
+
+    if (!$errors && $daycareUserId > 0) {
+        $day_name = date('l', strtotime($request_date));
+
+        $stmt = $conn->prepare("
+            SELECT is_available, start_time, end_time
+            FROM daycare_availability
+            WHERE daycare_user_id = ? AND day_name = ?
+            LIMIT 1
+        ");
+        $stmt->bind_param("is", $daycareUserId, $day_name);
+        $stmt->execute();
+        $availabilityRow = $stmt->get_result()->fetch_assoc();
+
+        if (!$availabilityRow || (int)$availabilityRow['is_available'] !== 1) {
+            $errors[] = "Daycare is closed on $day_name.";
+        }
     }
 
     if (!$errors) {
@@ -61,6 +113,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .error { background:#ffecec; border:1px solid #f5c6cb; color:#a94442; }
         .success { background:#e8fff1; border:1px solid #aad7b7; color:#1e6c35; }
         .back-link { color:#1b6ec2; text-decoration:none; font-weight:bold; }
+        .availability-note {
+            margin-top: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #fff9e8;
+            border: 1px solid #f0d98a;
+            color: #6a5800;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
@@ -71,6 +134,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p><strong>Capacity:</strong> <?php echo e($daycare['capacity'] ?: '-'); ?></p>
         <p><strong>Timings:</strong> <?php echo e(($daycare['opening_time'] ?: '-') . ' - ' . ($daycare['closing_time'] ?: '-')); ?></p>
         <p><strong>Age Group:</strong> <?php echo e($daycare['age_group_supported'] ?: '-'); ?></p>
+
+        <div class="availability-note">
+            <strong>Weekly Daycare Timings:</strong><br>
+            <?php echo nl2br(e($availabilityText)); ?>
+        </div>
 
         <?php if ($success): ?>
             <div class="alert success"><?php echo e($success); ?></div>
