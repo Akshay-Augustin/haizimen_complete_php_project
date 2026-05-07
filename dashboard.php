@@ -73,11 +73,6 @@ $role = $user['role'];
             color: white;
         }
 
-        .nav-btn.logout {
-            background: #eaf4ff;
-            border-color: #d9ebfb;
-        }
-
         .wrap {
             max-width: 1100px;
             margin: 0 auto;
@@ -92,34 +87,9 @@ $role = $user['role'];
             margin-bottom: 25px;
         }
 
-        .msg {
-            padding: 12px 14px;
-            background: #e8fff1;
-            border: 1px solid #aad7b7;
-            color: #1e6c35;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-
-        h1, h2 {
+        h2 {
             margin-top: 0;
             color: #1b6ec2;
-        }
-
-        .user-meta {
-            display: grid;
-            gap: 10px;
-            margin-top: 18px;
-        }
-
-        .meta-item {
-            color: #4a5c6b;
-            font-size: 17px;
-        }
-
-        .meta-item i {
-            color: #1b6ec2;
-            width: 24px;
         }
 
         .grid {
@@ -209,7 +179,7 @@ $role = $user['role'];
                 <i class="fa-solid fa-house"></i>
                 Home
             </a> -->
-            <a class="nav-btn logout" href="logout.php">
+            <a class="nav-btn" href="logout.php">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 Logout
             </a>
@@ -218,17 +188,45 @@ $role = $user['role'];
 </div>
 
 <div class="wrap">
+
     <?php if ($role === 'parent'): ?>
         <div class="card">
-            <h2>Dashboard</h2>
+            <h2>Parent Dashboard</h2>
             <div class="grid">
-                <div class="feature-card">
+                <!-- <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fa-solid fa-syringe"></i>
                     </div>
                     <h3>Vaccination Details</h3>
-                    <p>Search vaccines, read descriptions, and choose the right vaccine information for your child.</p>
+                    <p>View the vaccination chart, age groups, diseases covered, and vaccine information.</p>
                     <a class="btn" href="vaccines.php">View Vaccines</a>
+                </div> -->
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-notes-medical"></i>
+                    </div>
+                    <h3>Book Vaccine</h3>
+                    <p>Choose a vaccine and schedule a vaccination booking with an available doctor.</p>
+                    <a class="btn" href="vaccines.php">Book Vaccine</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <h3>Vaccine Reminders</h3>
+                    <p>Check upcoming vaccine reminders and see which dose is due in the next few days.</p>
+                    <a class="btn" href="vaccine_reminders.php">View Reminders</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <h3>Vaccine History</h3>
+                    <p>See your previous vaccine bookings, statuses, dates, and assigned doctors.</p>
+                    <a class="btn" href="vaccine_history.php">View History</a>
                 </div>
 
                 <div class="feature-card">
@@ -245,11 +243,56 @@ $role = $user['role'];
                         <i class="fa-solid fa-calendar-check"></i>
                     </div>
                     <h3>My Appointments</h3>
-                    <p>Track all your booked appointments and see their current status.</p>
+                    <p>Track all your booked doctor appointments and see their current status.</p>
                     <a class="btn" href="my_appointments.php">View Appointments</a>
                 </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-user-nurse"></i>
+                    </div>
+                    <h3>View Caretakers</h3>
+                    <p>Browse available caretakers with their experience, skills, location, and rates.</p>
+                    <a class="btn" href="caretakers.php">View Caretakers</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+                    <h3>Caretaker History</h3>
+                    <p>Track your caretaker requests and see whether they are pending, approved, rejected, or completed.</p>
+                    <a class="btn" href="caretaker_history.php">View History</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <h3>View Daycares</h3>
+                    <p>Explore daycare centers with timings, facilities, capacity, and contact details.</p>
+                    <a class="btn" href="daycares.php">View Daycares</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <h3>Daycare History</h3>
+                    <p>See your daycare requests, request dates, child age details, and current status.</p>
+                    <a class="btn" href="daycare_history.php">View History</a>
+                </div>
+                <!-- <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <h3>Availability</h3>
+                <p>Manage weekly daycare timings and availability for parents.</p>
+                <a class="btn" href="daycare_availability.php">Manage Availability</a>
             </div>
+            </div> -->
         </div>
+
     <?php elseif ($role === 'doctor'): ?>
         <div class="card">
             <h2>Doctor Dashboard</h2>
@@ -259,11 +302,136 @@ $role = $user['role'];
                         <i class="fa-solid fa-stethoscope"></i>
                     </div>
                     <h3>Incoming Appointments</h3>
-                    <p>View all appointment requests booked by parents for you.</p>
+                    <p>View all appointment requests booked by parents and update their status.</p>
                     <a class="btn" href="doctor_appointments.php">View Appointments</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-syringe"></i>
+                    </div>
+                    <h3>Vaccine Bookings</h3>
+                    <p>See vaccine bookings assigned to you and manage vaccination requests.</p>
+                    <a class="btn" href="doctor_vaccine_bookings.php">View Vaccine Bookings</a>
+                </div>
+                <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <h3>My Availability</h3>
+                <p>Set your weekly available timings for appointment booking.</p>
+                <a class="btn" href="doctor_availability.php">Manage Availability</a>
+            </div>
+            </div>
+        </div>
+
+    <?php elseif ($role === 'caretaker'): ?>
+        <div class="card">
+            <h2>Caretaker Dashboard</h2>
+            <div class="grid">
+                <!-- <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-id-badge"></i>
+                    </div>
+                    <h3>My Profile</h3>
+                    <p>View your caretaker profile, experience, skills, and contact details.</p>
+                    <a class="btn" href="caretaker_profile.php">Open</a>
+                </div> -->
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <h3>Requests</h3>
+                    <p>See upcoming caretaker requests and manage assignments.</p>
+                    <a class="btn" href="caretaker_requests.php">Open</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <h3>Availability</h3>
+                    <p>Manage working hours, availability, and preferred locations.</p>
+                    <a class="btn" href="caretaker_availability.php">Open</a>
                 </div>
             </div>
         </div>
+
+    <?php elseif ($role === 'daycare'): ?>
+        <div class="card">
+            <h2>Daycare Dashboard</h2>
+            <div class="grid">
+                <!-- <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <h3>Center Profile</h3>
+                    <p>View and manage daycare center details, timings, and facilities.</p>
+                    <a class="btn" href="daycare_profile.php">Open</a>
+                </div> -->
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-user-group"></i>
+                    </div>
+                    <h3>Requests</h3>
+                    <p>See parent enrollment requests and manage daycare entries.</p>
+                    <a class="btn" href="daycare_requests.php">Open</a>
+                </div>
+                                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <h3>Availability</h3>
+                    <p>Manage working hours, availability, and preferred locations.</p>
+                    <a class="btn" href="daycare_availability.php">Open</a>
+                </div>
+
+
+                <!-- <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-building-circle-check"></i>
+                    </div>
+                    <h3>Capacity</h3>
+                    <p>Track daycare capacity, opening hours, and current occupancy details.</p>
+                    <a class="btn" href="daycare_capacity.php">Open</a>
+                </div> -->
+            </div>
+        </div>
+        <?php elseif ($role === 'hospital'): ?>
+    <div class="card">
+        <h2>Hospital Dashboard</h2>
+        <div class="grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-syringe"></i>
+                </div>
+                <h3>Vaccine Requests</h3>
+                <p>Review vaccine requests sent by doctors and update their hospital processing status.</p>
+                <a class="btn" href="hospital_vaccine_requests.php">Open Requests</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <h3>Doctors</h3>
+                <p>View doctors linked to your hospital.</p>
+                <a class="btn" href="hospital_doctors.php">View Doctors</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+                <h3>Hospital Profile</h3>
+                <p>View hospital details, timing, address, and contact information.</p>
+                <a class="btn" href="hospital_profile.php">Open Profile</a>
+            </div>
+        </div>
+    </div>
+
     <?php else: ?>
         <div class="card">
             <h2><?php echo ucfirst(e($role)); ?> Dashboard</h2>
@@ -278,6 +446,7 @@ $role = $user['role'];
             </div>
         </div>
     <?php endif; ?>
+
 </div>
 </body>
 </html>

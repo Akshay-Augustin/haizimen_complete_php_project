@@ -12,7 +12,7 @@ if ($user['role'] !== 'parent') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $doctor_id = (int)($_POST['doctor_id'] ?? 0);
+    $doctor_id = (int)($_POST['doctor_id'] ?? 0); // this is doctor user_id now
     $appointment_date = trim($_POST['appointment_date'] ?? '');
     $appointment_time = trim($_POST['appointment_time'] ?? '');
     $notes = trim($_POST['notes'] ?? '');
@@ -22,14 +22,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($appointment_time === '') $errors[] = 'Appointment time is required.';
 
     if (!$errors) {
-        $stmt = $conn->prepare("INSERT INTO appointments (parent_user_id, doctor_id, appointment_date, appointment_time, notes, status) VALUES (?, ?, ?, ?, ?, 'pending')");
-        $stmt->bind_param("iisss", $user['id'], $doctor_id, $appointment_date, $appointment_time, $notes);
+        $day_name = date('l', strtotime($appointment_date));
+
+        $stmt = $conn->prepare("
+            SELECT is_available, start_time, end_time
+            FROM doctor_availability
+            WHERE doctor_user_id = ? AND day_name = ?
+            LIMIT 1
+        ");
+        $stmt->bind_param("is", $doctor_id, $day_name);
         $stmt->execute();
-        $success = 'Appointment booked successfully.';
+        $availabilityResult = $stmt->get_result();
+        $availabilityRow = $availabilityResult->fetch_assoc();
+
+        if (!$availabilityRow || (int)$availabilityRow['is_available'] !== 1) {
+            $errors[] = "Doctor is not available on $day_name.";
+        } else {
+            $selectedTime = strtotime($appointment_time);
+            $startTime = strtotime($availabilityRow['start_time']);
+            $endTime = strtotime($availabilityRow['end_time']);
+
+            if ($selectedTime < $startTime || $selectedTime > $endTime) {
+                $errors[] = "Doctor is available on $day_name only from " .
+                    date('g:i A', $startTime) . " to " . date('g:i A', $endTime) . ".";
+            }
+        }
+
+        if (!$errors) {
+            $stmt = $conn->prepare("
+                INSERT INTO appointments (parent_user_id, doctor_id, appointment_date, appointment_time, notes, status)
+                VALUES (?, ?, ?, ?, ?, 'pending')
+            ");
+            $stmt->bind_param("iisss", $user['id'], $doctor_id, $appointment_date, $appointment_time, $notes);
+            $stmt->execute();
+            $success = 'Appointment booked successfully.';
+        }
     }
 }
 
-$doctors = $conn->query("SELECT * FROM doctors ORDER BY doctor_name ASC");
+$doctorRows = [];
+$doctorResult = $conn->query("SELECT * FROM doctors ORDER BY doctor_name ASC");
+
+while ($doctor = $doctorResult->fetch_assoc()) {
+    $doctorUserId = (int)$doctor['user_id'];
+    $availability = [];
+
+    $stmt = $conn->prepare("
+        SELECT day_name, is_available, start_time, end_time
+        FROM doctor_availability
+        WHERE doctor_user_id = ?
+        ORDER BY FIELD(day_name, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+    ");
+    $stmt->bind_param("i", $doctorUserId);
+    $stmt->execute();
+    $availabilityResult = $stmt->get_result();
+
+    while ($row = $availabilityResult->fetch_assoc()) {
+        if ((int)$row['is_available'] === 1) {
+            $availability[] = $row['day_name'] . ': ' .
+                date('g:i A', strtotime($row['start_time'])) . ' to ' .
+                date('g:i A', strtotime($row['end_time']));
+        } else {
+            $availability[] = $row['day_name'] . ': Not Available';
+        }
+    }
+
+    $doctor['availability_text'] = !empty($availability)
+        ? implode(" | ", $availability)
+        : 'Availability not updated yet';
+
+    $doctorRows[] = $doctor;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -123,6 +186,19 @@ $doctors = $conn->query("SELECT * FROM doctors ORDER BY doctor_name ASC");
             color: #1e6c35;
         }
 
+        .availability-note {
+            display: none;
+            margin-top: -6px;
+            margin-bottom: 14px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #fff9e8;
+            border: 1px solid #f0d98a;
+            color: #6a5800;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
         .back-link {
             color: #1b6ec2;
             text-decoration: none;
@@ -153,14 +229,22 @@ $doctors = $conn->query("SELECT * FROM doctors ORDER BY doctor_name ASC");
 
         <form method="POST">
             <label>Select Doctor</label>
-            <select name="doctor_id" required>
+            <select name="doctor_id" id="doctor_id" required>
                 <option value="">Choose doctor</option>
-                <?php while ($doctor = $doctors->fetch_assoc()): ?>
-                    <option value="<?php echo (int)$doctor['id']; ?>">
+                <?php foreach ($doctorRows as $doctor): ?>
+                    <option
+                        value="<?php echo (int)$doctor['user_id']; ?>"
+                        data-availability="<?php echo htmlspecialchars($doctor['availability_text'], ENT_QUOTES, 'UTF-8'); ?>"
+                    >
                         <?php echo e($doctor['doctor_name']); ?> - <?php echo e($doctor['department']); ?>
                     </option>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </select>
+
+            <div id="doctorAvailabilityNote" class="availability-note">
+                <strong>Doctor Availability:</strong><br>
+                <span id="doctorAvailabilityText"></span>
+            </div>
 
             <label>Appointment Date</label>
             <input type="date" name="appointment_date" required>
@@ -177,5 +261,29 @@ $doctors = $conn->query("SELECT * FROM doctors ORDER BY doctor_name ASC");
 
     <a class="back-link" href="dashboard.php">← Back to Dashboard</a>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const doctorSelect = document.getElementById('doctor_id');
+    const noteBox = document.getElementById('doctorAvailabilityNote');
+    const noteText = document.getElementById('doctorAvailabilityText');
+
+    function updateAvailability() {
+        const selected = doctorSelect.options[doctorSelect.selectedIndex];
+        const availability = selected.getAttribute('data-availability') || '';
+
+        if (doctorSelect.value && availability) {
+            noteText.textContent = availability.replaceAll(' | ', '\n');
+            noteBox.style.display = 'block';
+        } else {
+            noteText.textContent = '';
+            noteBox.style.display = 'none';
+        }
+    }
+
+    doctorSelect.addEventListener('change', updateAvailability);
+    updateAvailability();
+});
+</script>
 </body>
 </html>
