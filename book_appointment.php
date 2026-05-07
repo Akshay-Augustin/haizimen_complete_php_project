@@ -12,7 +12,7 @@ if ($user['role'] !== 'parent') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $doctor_id = (int)($_POST['doctor_id'] ?? 0); // this is doctor user_id now
+    $doctor_id = (int)($_POST['doctor_id'] ?? 0); // doctors.id
     $appointment_date = trim($_POST['appointment_date'] ?? '');
     $appointment_time = trim($_POST['appointment_time'] ?? '');
     $notes = trim($_POST['notes'] ?? '');
@@ -21,16 +21,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($appointment_date === '') $errors[] = 'Appointment date is required.';
     if ($appointment_time === '') $errors[] = 'Appointment time is required.';
 
+    $doctor_user_id = 0;
+
+    if (!$errors) {
+        // Get doctor user_id using doctors.id
+        $stmt = $conn->prepare("SELECT user_id FROM doctors WHERE id = ? LIMIT 1");
+        $stmt->bind_param("i", $doctor_id);
+        $stmt->execute();
+        $doctorResult = $stmt->get_result();
+        $doctorRow = $doctorResult->fetch_assoc();
+
+        if (!$doctorRow) {
+            $errors[] = 'Invalid doctor selected.';
+        } else {
+            $doctor_user_id = (int)$doctorRow['user_id'];
+        }
+    }
+
     if (!$errors) {
         $day_name = date('l', strtotime($appointment_date));
 
+        // Availability table uses doctor_user_id
         $stmt = $conn->prepare("
             SELECT is_available, start_time, end_time
             FROM doctor_availability
             WHERE doctor_user_id = ? AND day_name = ?
             LIMIT 1
         ");
-        $stmt->bind_param("is", $doctor_id, $day_name);
+        $stmt->bind_param("is", $doctor_user_id, $day_name);
         $stmt->execute();
         $availabilityResult = $stmt->get_result();
         $availabilityRow = $availabilityResult->fetch_assoc();
@@ -47,16 +65,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     date('g:i A', $startTime) . " to " . date('g:i A', $endTime) . ".";
             }
         }
+    }
 
-        if (!$errors) {
-            $stmt = $conn->prepare("
-                INSERT INTO appointments (parent_user_id, doctor_id, appointment_date, appointment_time, notes, status)
-                VALUES (?, ?, ?, ?, ?, 'pending')
-            ");
-            $stmt->bind_param("iisss", $user['id'], $doctor_id, $appointment_date, $appointment_time, $notes);
-            $stmt->execute();
-            $success = 'Appointment booked successfully.';
-        }
+    if (!$errors) {
+        // Appointments table uses doctors.id
+        $stmt = $conn->prepare("
+            INSERT INTO appointments 
+            (parent_user_id, doctor_id, appointment_date, appointment_time, notes, status)
+            VALUES (?, ?, ?, ?, ?, 'pending')
+        ");
+        $stmt->bind_param("iisss", $user['id'], $doctor_id, $appointment_date, $appointment_time, $notes);
+        $stmt->execute();
+
+        $success = 'Appointment booked successfully.';
     }
 }
 
@@ -100,6 +121,7 @@ while ($doctor = $doctorResult->fetch_assoc()) {
     <meta charset="utf-8">
     <title>Book Appointment</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style>
         body {
             margin: 0;
@@ -210,6 +232,7 @@ while ($doctor = $doctorResult->fetch_assoc()) {
         }
     </style>
 </head>
+
 <body>
 <div class="wrap">
     <div class="card">
@@ -229,11 +252,13 @@ while ($doctor = $doctorResult->fetch_assoc()) {
 
         <form method="POST">
             <label>Select Doctor</label>
+
             <select name="doctor_id" id="doctor_id" required>
                 <option value="">Choose doctor</option>
+
                 <?php foreach ($doctorRows as $doctor): ?>
                     <option
-                        value="<?php echo (int)$doctor['user_id']; ?>"
+                        value="<?php echo (int)$doctor['id']; ?>"
                         data-availability="<?php echo htmlspecialchars($doctor['availability_text'], ENT_QUOTES, 'UTF-8'); ?>"
                     >
                         <?php echo e($doctor['doctor_name']); ?> - <?php echo e($doctor['department']); ?>
